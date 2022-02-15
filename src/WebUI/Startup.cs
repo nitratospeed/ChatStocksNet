@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Infrastructure;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
@@ -26,12 +27,14 @@ namespace WebUI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddInfrastructure(Configuration);
+            services.AddHttpContextAccessor();
+            services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime lifetime)
         {
             if (env.IsDevelopment())
             {
@@ -53,9 +56,21 @@ namespace WebUI
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
                 endpoints.MapHub<SignalRService>("/chatHub");
             });
+
+            lifetime.ApplicationStarted.Register(() => RegisterSignalRWithRabbitMQ(app.ApplicationServices));
+        }
+
+        public void RegisterSignalRWithRabbitMQ(IServiceProvider serviceProvider)
+        {
+            // Connect to RabbitMQ
+            var rabbitMQService = (IRabbitMQConsumerService)serviceProvider.GetService(typeof(IRabbitMQConsumerService));
+            rabbitMQService.Receive();
         }
     }
 }

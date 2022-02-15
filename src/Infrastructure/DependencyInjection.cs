@@ -2,6 +2,8 @@
 using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,19 +20,22 @@ namespace Infrastructure
             //            b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
             //services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>());
-            services.AddScoped<ISignalRService, SignalRService>();
+            
+            services.AddSingleton<IRabbitMQConsumerService, RabbitMQConsumerService>();
+            services.AddSingleton<IRabbitMQProducerService, RabbitMQProducerService>();
+            services.AddSingleton<ISignalRService, SignalRService>();
 
-            //services.AddHttpClient("Client", c =>
-            //{
-            //    c.DefaultRequestHeaders.Connection.Add("keep-alive");
-            //    c.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-            //    c.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-            //    c.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
-            //    c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            //}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-            //{
-            //    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
-            //});
+            services.AddHttpClient("Client", c =>
+            {
+                c.DefaultRequestHeaders.Connection.Add("keep-alive");
+                c.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                c.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+                c.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
+                c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
+            });
 
             return services;
         }
