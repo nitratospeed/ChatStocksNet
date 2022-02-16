@@ -24,6 +24,12 @@ connection.start().then(function () {
 document.getElementById("sendButton").addEventListener("click", function (event) {
     var user = document.getElementById("userInput").value;
     var message = document.getElementById("messageInput").value;
+
+    if (message.includes("/stock=")) {
+        let stock_code = message.split('=')[1].split(' ')[0];
+        callStockBot(stock_code);
+    }
+
     var room = document.getElementById("room").value;
     connection.invoke("SendMessage", user, message, room, false).catch(function (err) {
         return console.error(err.toString());
@@ -43,3 +49,10 @@ document.getElementById("joinButton").addEventListener("click", function (event)
     });
     event.preventDefault();
 });
+
+function callStockBot(stock_code) {
+    fetch("/api/stocks/" + stock_code)
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}

@@ -24,6 +24,7 @@ namespace Infrastructure
             services.AddSingleton<IRabbitMQConsumerService, RabbitMQConsumerService>();
             services.AddSingleton<IRabbitMQProducerService, RabbitMQProducerService>();
             services.AddSingleton<ISignalRService, SignalRService>();
+            services.AddSingleton<IStockService, StockService>();
 
             services.AddHttpClient("Client", c =>
             {
