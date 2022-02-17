@@ -51,7 +51,7 @@ document.getElementById("joinButton").addEventListener("click", function (event)
 });
 
 function callStockBot(stock_code) {
-    fetch("/api/stocks/" + stock_code)
+    fetch("/api/v1/stocks/" + stock_code)
         .catch((error) => {
             console.error('Error:', error);
         });

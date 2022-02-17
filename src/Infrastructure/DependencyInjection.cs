@@ -4,9 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Infrastructure.Persistence.Repositories;
 
 namespace Infrastructure
 {
@@ -14,17 +14,16 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddDbContext<AppDbContext>(options =>
-            //        options.UseSqlServer(
-            //            configuration.GetConnectionString("DefaultConnection"),
-            //            b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+            services.AddDbContext<AppDbContext>(options =>
+                    options.UseNpgsql(
+                        configuration.GetConnectionString("DefaultConnection"),
+                        b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
-            //services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>());
-            
             services.AddSingleton<IRabbitMQConsumerService, RabbitMQConsumerService>();
             services.AddSingleton<IRabbitMQProducerService, RabbitMQProducerService>();
             services.AddSingleton<ISignalRService, SignalRService>();
             services.AddSingleton<IStockService, StockService>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddHttpClient("Client", c =>
             {
