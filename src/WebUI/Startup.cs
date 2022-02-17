@@ -90,14 +90,6 @@ namespace WebUI
                 endpoints.MapRazorPages();
                 endpoints.MapHub<SignalRService>("/chatHub");
             });
-
-            lifetime.ApplicationStarted.Register(() => RegisterSignalRWithRabbitMQ(app.ApplicationServices));
-        }
-
-        public void RegisterSignalRWithRabbitMQ(IServiceProvider serviceProvider)
-        {
-            var rabbitMQService = (IRabbitMQConsumerService)serviceProvider.GetService(typeof(IRabbitMQConsumerService));
-            rabbitMQService.Receive();
         }
     }
 }

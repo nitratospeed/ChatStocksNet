@@ -9,6 +9,7 @@ namespace Application.Core.Stocks.Queries
     public class NotifyStockByStockIdQuery : IRequest<BaseResult<bool>>
     {
         public string StockCode { get; set; }
+        public string Room { get; set; }
     }
     public class NotifyStockByStockIdQueryHandler : IRequestHandler<NotifyStockByStockIdQuery, BaseResult<bool>>
     {
@@ -24,9 +25,14 @@ namespace Application.Core.Stocks.Queries
         public async Task<BaseResult<bool>> Handle(NotifyStockByStockIdQuery request, CancellationToken cancellationToken)
         {
             var stockResult = await _stockService.GetByStockCode(request.StockCode);
-            _rabbitMQProducerService.Push(stockResult);
+            var sendResult = _rabbitMQProducerService.Send(request.Room, stockResult);
 
-            return BaseResult<bool>.Success(true, "");
+            if (sendResult)
+            {
+                return BaseResult<bool>.Success(sendResult, "");
+            }
+
+            return BaseResult<bool>.Failure(sendResult, "");
         }
     }
 }

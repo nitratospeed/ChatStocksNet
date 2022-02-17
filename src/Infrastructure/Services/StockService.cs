@@ -62,7 +62,7 @@ namespace Infrastructure.Services
                 }
                 else
                 {
-                    _logger.LogInformation($"{response.StatusCode}:{response.ReasonPhrase}");
+                    _logger.LogInformation($"GetByStockCode: {response.StatusCode}:{response.ReasonPhrase}");
                     result = "Service error. Try again in a few minutes.";
                 }
 
@@ -70,8 +70,8 @@ namespace Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-                return "Unknown service error. Try again in a few minutes.";
+                _logger.LogError($"GetByStockCode: {ex.Message}");
+                return "Unknown error. Try again in a few minutes.";
             }
         }
     }

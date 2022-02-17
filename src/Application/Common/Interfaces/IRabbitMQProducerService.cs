@@ -6,6 +6,6 @@ namespace Application.Common.Interfaces
 {
     public interface IRabbitMQProducerService
     {
-        void Push(string message); 
+        bool Send(string room, string message); 
     }
 }

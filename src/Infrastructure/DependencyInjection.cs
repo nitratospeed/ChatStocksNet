@@ -19,7 +19,7 @@ namespace Infrastructure
                         configuration.GetConnectionString("DefaultConnection"),
                         b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
-            services.AddSingleton<IRabbitMQConsumerService, RabbitMQConsumerService>();
+            services.AddHostedService<RabbitMQConsumerService>();
             services.AddSingleton<IRabbitMQProducerService, RabbitMQProducerService>();
             services.AddSingleton<ISignalRService, SignalRService>();
             services.AddSingleton<IStockService, StockService>();

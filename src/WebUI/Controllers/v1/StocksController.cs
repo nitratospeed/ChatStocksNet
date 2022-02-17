@@ -7,10 +7,10 @@ namespace WebUI.Controllers.v1
 {
     public class StocksController : BaseApiController
     {
-        [HttpGet("{stock_code}")]
-        public async Task<IActionResult> Get(string stock_code)
+        [HttpGet]
+        public async Task<IActionResult> Get(string room, string stock_code)
         {
-            return Ok(await Mediator.Send(new NotifyStockByStockIdQuery { StockCode = stock_code }));
+            return Ok(await Mediator.Send(new NotifyStockByStockIdQuery { Room = room, StockCode = stock_code }));
         }
     }
 }

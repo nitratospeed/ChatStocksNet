@@ -22,12 +22,13 @@ connection.start().then(function () {
 });
 
 document.getElementById("sendButton").addEventListener("click", function (event) {
+    var room = document.getElementById("room").value;
     var user = document.getElementById("userInput").value;
     var message = document.getElementById("messageInput").value;
 
     if (message.includes("/stock=")) {
         let stock_code = message.split('=')[1].split(' ')[0];
-        callStockBot(stock_code);
+        callStockBot(room, stock_code);
     }
 
     var room = document.getElementById("room").value;
@@ -50,9 +51,17 @@ document.getElementById("joinButton").addEventListener("click", function (event)
     event.preventDefault();
 });
 
-function callStockBot(stock_code) {
-    fetch("/api/v1/stocks/" + stock_code)
+function callStockBot(room, stock_code) {
+    fetch(`/api/v1/stocks?room=${room}&stock_code=${stock_code}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.succeeded == false) {
+                alert("System error. Please try again in a few minutes");
+            }
+        })
         .catch((error) => {
             console.error('Error:', error);
+            alert("Unknown error. Please try again in a few minutes");
         });
 }
