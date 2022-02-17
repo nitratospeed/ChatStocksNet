@@ -39,15 +39,21 @@ document.getElementById("sendButton").addEventListener("click", function (event)
 });
 
 document.getElementById("joinButton").addEventListener("click", function (event) {
-
     var room = document.getElementById("room").value;
-    var user = document.getElementById("userInput").value;
-    var message = document.getElementById("messageInput").value;
-    connection.invoke("SendMessage", user, message, room, true).then(function () {
-        document.getElementById("messageDiv").style.display = "block";
-    }).catch(function (err) {
-        return console.error(err.toString());
-    });
+
+    if (room != "") {
+        var user = document.getElementById("userInput").value;
+        var message = document.getElementById("messageInput").value;
+        document.getElementById("messagesList").innerHTML = "";
+        connection.invoke("SendMessage", user, message, room, true).then(function () {           
+            document.getElementById("messageDiv").style.display = "block";
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });       
+    }
+    else {
+        alert("Please select a room.");
+    }
     event.preventDefault();
 });
 

@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Infrastructure.Persistence.Repositories;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure
 {
@@ -19,11 +19,15 @@ namespace Infrastructure
                         configuration.GetConnectionString("DefaultConnection"),
                         b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
+            services
+                .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+                        .AddEntityFrameworkStores<AppDbContext>();
+
             services.AddHostedService<RabbitMQConsumerService>();
             services.AddSingleton<IRabbitMQProducerService, RabbitMQProducerService>();
             services.AddSingleton<ISignalRService, SignalRService>();
             services.AddSingleton<IStockService, StockService>();
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IIdentityService, IdentityService>();
 
             services.AddHttpClient("Client", c =>
             {

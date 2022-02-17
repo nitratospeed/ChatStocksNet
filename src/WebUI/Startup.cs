@@ -37,7 +37,10 @@ namespace WebUI
             {
                 options.Filters.Add<ApiExceptionFilterAttribute>();
             });
-            services.AddRazorPages();
+            services.AddRazorPages(options =>
+            {
+                options.Conventions.AuthorizePage("/Index");
+            });
             services.AddSignalR();
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -79,6 +82,8 @@ namespace WebUI
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

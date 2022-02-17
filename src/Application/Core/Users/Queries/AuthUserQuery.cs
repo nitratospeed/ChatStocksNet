@@ -1,40 +1,36 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Models;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Core.Users.Queries
 {
-    public class AuthUserQuery : IRequest<BaseResult<string>>
+    public class AuthUserQuery : IRequest<BaseResult<bool>>
     {
         public string Email { get; set; }
         public string Password { get; set; }
     }
 
-    public class AuthUserQueryHandler : IRequestHandler<AuthUserQuery, BaseResult<string>>
+    public class AuthUserQueryHandler : IRequestHandler<AuthUserQuery, BaseResult<bool>>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IIdentityService _identityService;
 
-        public AuthUserQueryHandler(IUserRepository userRepository)
+        public AuthUserQueryHandler(IIdentityService identityService)
         {
-            _userRepository = userRepository;
+            _identityService = identityService;
         }
 
-        public async Task<BaseResult<string>> Handle(AuthUserQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResult<bool>> Handle(AuthUserQuery request, CancellationToken cancellationToken)
         {
-            var existsUser = await _userRepository.AnyFilter(x => x.Email == request.Email && x.Password == request.Password);
+            var existsUser = await _identityService.AuthUser(request.Email, request.Password);
 
             if (existsUser)
             {
-                var user = await _userRepository.GetByFilter(x => x.Email == request.Email);
-                return BaseResult<string>.Success(user.Fullname, "");
-                
+                return BaseResult<bool>.Success(existsUser, "");
+
             }
-            return BaseResult<string>.Failure("", "Invalid user or password");
+            return BaseResult<bool>.Failure(existsUser, "Invalid email or password");
         }
     }
 }

@@ -7,34 +7,27 @@ using System.Threading.Tasks;
 
 namespace Application.Core.Users.Commands
 {
-    public class CreateUserCommand : IRequest<BaseResult<int>>
+    public class CreateUserCommand : IRequest<BaseResult<bool>>
     {
         public string Email { get; set; }
         public string Password { get; set; }
         public string FullName { get; set; }
     }
 
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, BaseResult<int>>
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, BaseResult<bool>>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IIdentityService _identityService;
 
-        public CreateUserCommandHandler(IUserRepository userRepository)
+        public CreateUserCommandHandler(IIdentityService identityService)
         {
-            _userRepository = userRepository;
+            _identityService = identityService;
         }
 
-        public async Task<BaseResult<int>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task<BaseResult<bool>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            var entity = new User
-            {
-                Email = request.Email,
-                Password = request.Password,
-                Fullname = request.FullName,
-            };
+            var result = await _identityService.RegisterUser(request.Email, request.Password);
 
-            var result = await _userRepository.Insert(entity);
-
-            return BaseResult<int>.Success(result.Id, "");
+            return BaseResult<bool>.Success(result, "");
         }
     }
 }
