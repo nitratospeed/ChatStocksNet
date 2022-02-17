@@ -49,24 +49,28 @@ namespace Infrastructure.Services
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    var consumer = new EventingBasicConsumer(_channel);
-
-                    consumer.Received += async (model, ea) =>
+                    if (_channel != null)
                     {
-                        var body = ea.Body.ToArray();
+                        var consumer = new EventingBasicConsumer(_channel);
 
-                        var message = Encoding.UTF8.GetString(body);
+                        consumer.Received += async (model, ea) =>
+                        {
+                            var body = ea.Body.ToArray();
 
-                        var chatHub = (IHubContext<SignalRService>)_serviceProvider.GetService(typeof(IHubContext<SignalRService>));
+                            var message = Encoding.UTF8.GetString(body);
 
-                        await chatHub.Clients.Group(message.Split('|')[0]).SendAsync("ReceiveMessage", "StocksBot", $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} StocksBot says: {message.Split('|')[1]}");
-                    };
+                            var chatHub = (IHubContext<SignalRService>)_serviceProvider.GetService(typeof(IHubContext<SignalRService>));
 
-                    _channel.BasicConsume(queue: "TestQueue",
-                                         autoAck: true,
-                                         consumer: consumer);
+                            await chatHub.Clients.Group(message.Split('|')[0]).SendAsync("ReceiveMessage", "StocksBot", $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} StocksBot says: {message.Split('|')[1]}");
+                        };
 
-                    _logger.LogInformation($"RabbitMQConsumer task doing background work.");
+                        _channel.BasicConsume(queue: "TestQueue",
+                                             autoAck: true,
+                                             consumer: consumer);
+
+                        _logger.LogInformation($"RabbitMQConsumer task doing background work.");
+
+                    }
 
                     return Task.CompletedTask;
                 }
