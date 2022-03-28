@@ -7,7 +7,7 @@
 - Microsoft Entity Framework Core
 - Microsoft Identity
 - Microsoft Extensions
-- NpgSql
+- InMemory EFCore (DB only persists when app is running, stored in memory)
 - RabbitMQ
 - SignalR
 - MassTransit
